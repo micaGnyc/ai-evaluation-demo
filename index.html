@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI-Powered Evaluation Practice</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- SECTION 1: HERO -->
+  <section class="hero">
+    <h1>AI-Powered Evaluation Practice</h1>
+    <p class="hero-name">Micaela Gutierrez</p>
+    <p class="hero-tagline">Program evaluation expertise,<br>packaged as an AI system that<br>executes the work.</p>
+  </section>
+
+  <!-- SECTION 2: UX STRIP -->
+  <section class="ux-strip">
+    <div class="ux-columns">
+      <div class="ux-col">
+        <div class="ux-icon">&#128269;</div>
+        <div class="ux-label">You bring a project</div>
+        <div class="ux-desc">Client context, data, and evaluation questions. The system orients to where you are and what's needed.</div>
+      </div>
+      <div class="ux-arrow">&#8594;</div>
+      <div class="ux-col">
+        <div class="ux-icon">&#9881;&#65039;</div>
+        <div class="ux-label">Skills do the work</div>
+        <div class="ux-desc">Modular AI skills route and execute — from theory of change to statistical analysis to report writing.</div>
+      </div>
+      <div class="ux-arrow">&#8594;</div>
+      <div class="ux-col">
+        <div class="ux-icon">&#128190;</div>
+        <div class="ux-label">Everything is saved</div>
+        <div class="ux-desc">Outputs land in your project folder. Every session is logged. Pick up exactly where you left off.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 3: ARCHITECTURE DIAGRAM -->
+  <section class="architecture">
+    <h2 class="arch-heading">How It Works</h2>
+    <p class="arch-sub">Three layers work together on every engagement.</p>
+
+    <div class="arch-diagram">
+      <div class="arch-coordinator">
+        <div class="arch-box-label">COORDINATOR</div>
+        <div class="arch-box-sub">Orchestrates every session &mdash; from reading project context, to routing work, to logging outputs and improving skills after every deliverable</div>
+      </div>
+
+      <div class="arch-arrows-row">
+        <div class="arch-arrow-down arrow-left">
+          <div class="arrow-line"></div>
+          <div class="arrow-head"></div>
+        </div>
+        <div class="arch-arrow-down arrow-right">
+          <div class="arrow-line"></div>
+          <div class="arrow-head"></div>
+        </div>
+      </div>
+
+      <div class="arch-bottom-row">
+        <div class="arch-projects">
+          <div class="arch-box-label dark">PROJECTS</div>
+          <div class="arch-box-content">The memory of every engagement &mdash; client context, deliverables, session history, and next actions, always up to date</div>
+        </div>
+
+        <div class="arch-horiz-arrow">
+          <div class="horiz-line"></div>
+          <div class="horiz-head"></div>
+        </div>
+
+        <div class="arch-skills">
+          <div class="arch-box-label dark">SKILLS</div>
+          <div class="arch-phase-tags">
+            <span class="phase-pill">&#129517; Planning</span>
+            <span class="phase-pill">&#128203; Data Collection</span>
+            <span class="phase-pill">&#128300; Analysis</span>
+            <span class="phase-pill">&#128227; Reporting</span>
+          </div>
+          <div class="arch-skill-pills">
+            <span class="skill-pill">Theory of Change</span>
+            <span class="skill-pill">Measurement Design</span>
+            <span class="skill-pill">Survey Analysis</span>
+            <span class="skill-pill">Qualitative Analysis</span>
+            <span class="skill-pill">Critical Reviewer</span>
+            <span class="skill-pill">Literature Review</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 4: DEMO -->
+  <section class="demo-section">
+    <h2 class="demo-heading">See It In Action</h2>
+    <p class="demo-sub">A real example: analyzing feedback data for a feature prototype for Future Coach. The system analyzed data, produced a report, reviewed both for quality and recommended improvements, then created a final analysis workbook and report.</p>
+
+    <div class="demo-layout">
+      <!-- Left side: workspace -->
+      <div class="demo-main">
+        <div class="workspace">
+          <!-- Left: File Tray -->
+          <div class="ws-left" id="fileTray">
+            <div class="ws-column-label">FILES</div>
+            <div id="fileCards">
+              <div class="file-card" id="fileCard1">
+                <div class="file-emoji">&#128196;</div>
+                <div class="file-name">FutureCoach_Survey_Data.csv</div>
+                <button class="btn btn-teal file-send-btn" id="sendBtn1">&#8594; Send to Survey Analysis</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Center: Active Skill -->
+          <div class="ws-center">
+            <div class="ws-column-label">ACTIVE SKILL</div>
+            <div class="skill-panel" id="skillPanel">
+              <div class="skill-name" id="skillName">Survey Analysis</div>
+              <span class="phase-pill small" id="skillPhase">&#128300; Analysis</span>
+              <div class="skill-desc" id="skillDesc">Analyzes survey data and produces statistical summaries</div>
+              <div class="skill-input-zone" id="inputZone">Send data to begin</div>
+            </div>
+          </div>
+
+          <!-- Right: Chat Window -->
+          <div class="ws-right">
+            <div class="ws-column-label">SKILL CHAT</div>
+            <div class="chat-window" id="chatWindow">
+              <span class="chat-placeholder" id="chatPlaceholder">Waiting for input...</span>
+            </div>
+            <div id="chatBtnArea"></div>
+          </div>
+        </div>
+
+        <!-- Completion Banner -->
+        <div class="completion-banner" id="completionBanner">
+          <span style="color:#007A87">&#10004;</span>&ensp;Full evaluation cycle complete — 3 skills &middot; 5 outputs &middot; 0 issues remaining
+        </div>
+
+        <div class="reset-link-wrap">
+          <a href="javascript:location.reload()" class="reset-link">Reset demo</a>
+        </div>
+      </div>
+
+      <!-- Right side: Deliverables panel -->
+      <div class="deliverables-panel" id="deliverablesPanel">
+        <div class="ws-column-label">DELIVERABLES</div>
+        <div id="outputCards"></div>
+      </div>
+    </div>
+  </section>
+
+  <script src="demo.js"></script>
+</body>
+</html>
