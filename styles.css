@@ -396,6 +396,11 @@ body {
   opacity: 0;
   transform: translateX(120px);
   pointer-events: none;
+  max-height: 0;
+  padding: 0;
+  margin: 0;
+  border: none;
+  overflow: hidden;
 }
 
 .file-emoji {
@@ -481,7 +486,8 @@ body {
 
 /* Chat window */
 .chat-window {
-  background: #F8F9FA;
+  background: #FFFFFF;
+  border: 2px solid #007A87;
   border-radius: 8px;
   padding: 16px;
   height: 320px;
@@ -489,7 +495,7 @@ body {
   font-size: 13px;
   line-height: 1.6;
   font-family: 'Courier New', monospace;
-  color: #4A5A6A;
+  color: #1B2A4A;
   flex-shrink: 0;
 }
 
