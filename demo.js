@@ -368,6 +368,7 @@ async function runBeat2() {
   await wait(800);
   await streamText(chatWindow, "\n\nAnalysis complete. Stats workbook ready.", 30);
   await streamTextBold(chatWindow, "\n\nCheck it out in the deliverables section!", 30);
+  await streamText(chatWindow, "\n\nNow you can send the stats workbook to the Report Writer skill.", 30);
 
   // Clear file in skill
   clearFileInSkill();
