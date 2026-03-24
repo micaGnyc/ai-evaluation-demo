@@ -85,6 +85,15 @@ function appendChat(text) {
   scrollChat();
 }
 
+function appendChatBold(text) {
+  const p = document.createElement("div");
+  p.style.marginTop = "12px";
+  p.style.fontWeight = "600";
+  p.textContent = text;
+  chatWindow.appendChild(p);
+  scrollChat();
+}
+
 function addActionButton(text, className, onClick) {
   const btn = document.createElement("button");
   btn.className = "btn " + className;
@@ -246,7 +255,7 @@ function setFileCards(cards) {
     card.innerHTML =
       '<div class="file-emoji">' + c.emoji + "</div>" +
       '<div class="file-name">' + c.name + "</div>" +
-      (c.btnText ? '<button class="btn btn-teal file-send-btn" id="' + c.btnId + '">' + c.btnText + "</button>" : "");
+      (c.btnText ? '<button class="btn btn-green file-send-btn" id="' + c.btnId + '">' + c.btnText + "</button>" : "");
     fileCards.appendChild(card);
   });
 }
@@ -259,7 +268,7 @@ function addFileCard(card) {
   el.innerHTML =
     '<div class="file-emoji">' + card.emoji + "</div>" +
     '<div class="file-name">' + card.name + "</div>" +
-    (card.btnText ? '<button class="btn btn-teal file-send-btn" id="' + card.btnId + '">' + card.btnText + "</button>" : "");
+    (card.btnText ? '<button class="btn btn-green file-send-btn" id="' + card.btnId + '">' + card.btnText + "</button>" : "");
   fileCards.appendChild(el);
 }
 
@@ -334,6 +343,7 @@ async function runBeat2() {
   appendChat("Running analysis...");
   await wait(800);
   appendChat("Analysis complete. Stats workbook ready.");
+  appendChatBold("Check it out in the deliverables section!");
 
   // Clear file in skill
   clearFileInSkill();
@@ -405,7 +415,7 @@ async function runBeat3() {
 
   // Show "Generate Report" button below chat
   clearActionButtons();
-  addActionButton("\u2192 Generate Report", "btn-teal", function () {
+  addActionButton("\u2192 Generate Report", "btn-green", function () {
     if (isAnimating) return;
     runBeat3B();
   });
@@ -420,6 +430,7 @@ async function runBeat3B() {
   appendChat("Generating report...");
   await wait(800);
   appendChat("Report ready.");
+  appendChatBold("Check it out in the deliverables section!");
   await streamText(chatWindow, "\n\nWould you like to run a validation analysis on your workbook and report?", 25);
 
   // Clear file in skill
@@ -456,7 +467,7 @@ async function runBeat3B() {
 
   // Show validate button below chat
   clearActionButtons();
-  addActionButton("\u2192 Validate", "btn-teal", function () {
+  addActionButton("\u2192 Validate", "btn-green", function () {
     if (currentBeat !== 3) return;
     currentBeat = 4;
     runBeat4();
@@ -516,6 +527,7 @@ async function runBeat4() {
     "Four minor text-workbook discrepancies also flagged.\n\nValidation report ready.";
 
   await streamText(chatWindow, text, 25);
+  appendChatBold("Check it out in the deliverables section!");
   await streamText(chatWindow, "\n\nWould you like to produce updated stats workbook and report?", 25);
 
   clearFileInSkill();
@@ -533,7 +545,7 @@ async function runBeat4() {
   enableButtons();
 
   clearActionButtons();
-  addActionButton("\u2192 Update & Finalize", "btn-navy", function () {
+  addActionButton("\u2192 Update & Finalize", "btn-green", function () {
     if (currentBeat !== 4) return;
     currentBeat = 5;
     runBeat5();
@@ -554,6 +566,7 @@ async function runBeat5() {
     "Final workbook and report ready. No outstanding issues.";
 
   await streamText(chatWindow, text, 25);
+  appendChatBold("Check it out in the deliverables section!");
 
   addFinalCards([
     {
