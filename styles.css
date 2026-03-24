@@ -351,22 +351,21 @@ body {
   padding: 24px;
   display: flex;
   gap: 20px;
-  overflow: hidden;
 }
 
 .ws-left {
-  width: 20%;
-  flex-shrink: 0;
+  flex: 0 0 18%;
+  min-width: 0;
 }
 
 .ws-center {
-  width: 35%;
-  flex-shrink: 0;
+  flex: 0 0 32%;
+  min-width: 0;
 }
 
 .ws-right {
-  width: 45%;
-  flex-shrink: 0;
+  flex: 1;
+  min-width: 0;
   display: flex;
   flex-direction: column;
 }
