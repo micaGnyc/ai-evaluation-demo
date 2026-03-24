@@ -94,6 +94,30 @@ function appendChatBold(text) {
   scrollChat();
 }
 
+function streamTextBold(container, text, speed) {
+  speed = speed || 25;
+  return new Promise(resolve => {
+    let i = 0;
+    const span = document.createElement("span");
+    span.className = "blink-cursor";
+    span.style.fontWeight = "600";
+    container.appendChild(span);
+    scrollChat();
+
+    const interval = setInterval(() => {
+      if (i < text.length) {
+        span.textContent += text[i];
+        i++;
+        scrollChat();
+      } else {
+        clearInterval(interval);
+        span.classList.remove("blink-cursor");
+        resolve();
+      }
+    }, speed);
+  });
+}
+
 function addActionButton(text, className, onClick) {
   const btn = document.createElement("button");
   btn.className = "btn " + className;
@@ -340,10 +364,10 @@ async function runBeat2() {
   clearActionButtons();
 
   clearChat();
-  appendChat("Running analysis...");
+  await streamText(chatWindow, "Running analysis...", 30);
   await wait(800);
-  appendChat("Analysis complete. Stats workbook ready.");
-  appendChatBold("Check it out in the deliverables section!");
+  await streamText(chatWindow, "\n\nAnalysis complete. Stats workbook ready.", 30);
+  await streamTextBold(chatWindow, "\n\nCheck it out in the deliverables section!", 30);
 
   // Clear file in skill
   clearFileInSkill();
@@ -427,10 +451,10 @@ async function runBeat3B() {
   clearActionButtons();
 
   clearChat();
-  appendChat("Generating report...");
+  await streamText(chatWindow, "Generating report...", 30);
   await wait(800);
-  appendChat("Report ready.");
-  appendChatBold("Check it out in the deliverables section!");
+  await streamText(chatWindow, "\n\nReport ready.", 30);
+  await streamTextBold(chatWindow, "\n\nCheck it out in the deliverables section!", 30);
   await streamText(chatWindow, "\n\nWould you like to run a validation analysis on your workbook and report?", 25);
 
   // Clear file in skill
@@ -527,7 +551,7 @@ async function runBeat4() {
     "Four minor text-workbook discrepancies also flagged.\n\nValidation report ready.";
 
   await streamText(chatWindow, text, 25);
-  appendChatBold("Check it out in the deliverables section!");
+  await streamTextBold(chatWindow, "\n\nCheck it out in the deliverables section!", 30);
   await streamText(chatWindow, "\n\nWould you like to produce updated stats workbook and report?", 25);
 
   clearFileInSkill();
@@ -566,7 +590,7 @@ async function runBeat5() {
     "Final workbook and report ready. No outstanding issues.";
 
   await streamText(chatWindow, text, 25);
-  appendChatBold("Check it out in the deliverables section!");
+  await streamTextBold(chatWindow, "\n\nCheck it out in the deliverables section!", 30);
 
   addFinalCards([
     {
