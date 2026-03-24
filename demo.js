@@ -23,6 +23,7 @@ const skillName = document.getElementById("skillName");
 const skillPhase = document.getElementById("skillPhase");
 const skillDesc = document.getElementById("skillDesc");
 const inputZone = document.getElementById("inputZone");
+const skillFileZone = document.getElementById("skillFileZone");
 const chatWindow = document.getElementById("chatWindow");
 const chatPlaceholder = document.getElementById("chatPlaceholder");
 const chatBtnArea = document.getElementById("chatBtnArea");
@@ -215,12 +216,25 @@ function addFinalCards(cards) {
   });
 }
 
-function setSkill(name, phase, desc, inputText) {
+function setSkill(name, phase, desc) {
   skillName.textContent = name;
   skillPhase.innerHTML = phase;
   skillDesc.textContent = desc;
-  inputZone.textContent = inputText;
-  inputZone.classList.remove("glow");
+}
+
+// Show a received file icon in the skill panel
+function showFileInSkill(emoji, name) {
+  skillFileZone.innerHTML =
+    '<div class="skill-file-received">' +
+      '<span class="skill-file-emoji">' + emoji + '</span>' +
+      '<span class="skill-file-name">' + name + '</span>' +
+    '</div>';
+  skillFileZone.classList.add("visible");
+}
+
+function clearFileInSkill() {
+  skillFileZone.innerHTML = "";
+  skillFileZone.classList.remove("visible");
 }
 
 function setFileCards(cards) {
@@ -232,17 +246,33 @@ function setFileCards(cards) {
     card.innerHTML =
       '<div class="file-emoji">' + c.emoji + "</div>" +
       '<div class="file-name">' + c.name + "</div>" +
-      '<button class="btn btn-teal file-send-btn" id="' + c.btnId + '">' + c.btnText + "</button>";
+      (c.btnText ? '<button class="btn btn-teal file-send-btn" id="' + c.btnId + '">' + c.btnText + "</button>" : "");
     fileCards.appendChild(card);
   });
+}
+
+// Add a file card to the tray without clearing existing ones
+function addFileCard(card) {
+  const el = document.createElement("div");
+  el.className = "file-card";
+  el.id = card.id || "";
+  el.innerHTML =
+    '<div class="file-emoji">' + card.emoji + "</div>" +
+    '<div class="file-name">' + card.name + "</div>" +
+    (card.btnText ? '<button class="btn btn-teal file-send-btn" id="' + card.btnId + '">' + card.btnText + "</button>" : "");
+  fileCards.appendChild(el);
 }
 
 function animateFileToSkill(cardEl) {
   return new Promise(resolve => {
     cardEl.classList.add("animating");
-    setTimeout(resolve, 400);
+    setTimeout(resolve, 800);
   });
 }
+
+// ===== INITIAL STATE =====
+// Hide input zone on initial load (Beat 1 doesn't use it)
+inputZone.style.display = "none";
 
 // ===== BEAT 1 =====
 function triggerBeat1() {
@@ -251,32 +281,21 @@ function triggerBeat1() {
   runBeat1();
 }
 
-// Input zone acts as a clickable trigger — delegates to the current beat's pending action
-var pendingInputAction = null;
-
 document.getElementById("sendBtn1").addEventListener("click", triggerBeat1);
-pendingInputAction = triggerBeat1;
-
-inputZone.addEventListener("click", function () {
-  if (isAnimating) return;
-  if (pendingInputAction) {
-    pendingInputAction();
-    return;
-  }
-  // Beat 0 fallback (initial state)
-  if (currentBeat === 0) triggerBeat1();
-});
 
 async function runBeat1() {
-  pendingInputAction = null;
   disableAllButtons();
 
-  // Animate file card
-  const card = document.getElementById("fileCard1");
-  await animateFileToSkill(card);
+  // Get file info before animating
+  var fileCard = document.getElementById("fileCard1");
+  var fileEmoji = fileCard.querySelector(".file-emoji").textContent;
+  var fileName = fileCard.querySelector(".file-name").textContent;
 
-  // Glow input zone
-  inputZone.classList.add("glow");
+  // Animate file card (slow — 800ms)
+  await animateFileToSkill(fileCard);
+
+  // Show file icon landing in skill panel
+  showFileInSkill(fileEmoji, fileName);
   await wait(300);
 
   // Clear placeholder, start streaming
@@ -297,7 +316,7 @@ async function runBeat1() {
 
   enableButtons();
 
-  // Show approve button
+  // Show approve button below chat
   clearActionButtons();
   addActionButton("\u2714 Approve & Run Analysis", "btn-green", function () {
     if (currentBeat !== 1) return;
@@ -311,9 +330,13 @@ async function runBeat2() {
   disableAllButtons();
   clearActionButtons();
 
-  appendChat("\nRunning analysis...");
+  clearChat();
+  appendChat("Running analysis...");
   await wait(800);
-  appendChat("\nAnalysis complete. Stats workbook ready.");
+  appendChat("Analysis complete. Stats workbook ready.");
+
+  // Clear file in skill
+  clearFileInSkill();
 
   addOutputCard(
     "\uD83D\uDCCA",
@@ -323,91 +346,121 @@ async function runBeat2() {
     EMBED_URLS.workbook_draft
   );
 
+  // Add workbook file icon to the file tray
+  addFileCard({
+    id: "fileCard2",
+    emoji: "\uD83D\uDCCA",
+    name: "fc_prototype_stats_workbook_v3.xlsx",
+    btnId: "sendBtn2",
+    btnText: "\u2192 Send to Report Writer"
+  });
+
   await wait(400);
   enableButtons();
 
-  clearActionButtons();
-  addActionButton("\u2192 Generate Report", "btn-teal", function () {
-    if (currentBeat !== 2) return;
+  // Wire up the new file send button for Beat 3
+  document.getElementById("sendBtn2").addEventListener("click", function () {
+    if (isAnimating || currentBeat !== 2) return;
     currentBeat = 3;
     runBeat3();
   });
 }
 
-// ===== BEAT 3 =====
+// ===== BEAT 3 (two sub-steps) =====
 async function runBeat3() {
   disableAllButtons();
   clearActionButtons();
 
-  // Switch skill panel
+  // Switch skill panel to Report Writer
   setSkill(
     "Report Writer",
     "\uD83D\uDCE3 Reporting",
-    "Drafts evaluation reports from analysis outputs",
-    "Send workbook to begin"
+    "Drafts evaluation reports from analysis outputs"
   );
 
-  // Update file tray
-  setFileCards([
-    {
-      id: "fileCard2",
-      emoji: "\uD83D\uDCCA",
-      name: "fc_prototype_stats_workbook_v3.xlsx",
-      btnId: "sendBtn2",
-      btnText: "\u2192 Send to Report Writer"
-    }
-  ]);
+  // Animate workbook file to skill panel
+  var fileCard = document.getElementById("fileCard2");
+  var fileEmoji = fileCard.querySelector(".file-emoji").textContent;
+  var fileName = fileCard.querySelector(".file-name").textContent;
+  await animateFileToSkill(fileCard);
+
+  // Show file landing in skill
+  showFileInSkill(fileEmoji, fileName);
+  await wait(300);
+
+  // Step A: Stream preview chat with question
+  clearChat();
+
+  const previewText =
+    "Based on the analysis, I can draft an evaluation report. Key findings to highlight: " +
+    "NPS of -23.5, with a striking 59-point gender gap \u2014 female students rated the experience " +
+    "positively (NPS +5.9) while male students were largely dissatisfied (NPS -52.9).\n\n" +
+    "Report length was the top friction point \u2014 only 32% found the Big Five report the right " +
+    "length, versus 68% for Wheel of Life. Partial support for all three assumptions, with clear " +
+    "recommendations for next steps.\n\nWould you like to generate a report?";
+
+  await streamText(chatWindow, previewText, 25);
 
   enableButtons();
 
-  async function beat3Send() {
+  // Show "Generate Report" button below chat
+  clearActionButtons();
+  addActionButton("\u2192 Generate Report", "btn-teal", function () {
     if (isAnimating) return;
-    pendingInputAction = null;
-    disableAllButtons();
+    runBeat3B();
+  });
+}
 
-    const card = document.getElementById("fileCard2");
-    if (card) await animateFileToSkill(card);
-    inputZone.classList.add("glow");
-    await wait(300);
+// Beat 3 Step B: Generate the report
+async function runBeat3B() {
+  disableAllButtons();
+  clearActionButtons();
 
-    clearChat();
+  clearChat();
+  appendChat("Generating report...");
+  await wait(800);
+  appendChat("Report ready.");
+  await streamText(chatWindow, "\n\nWould you like to run a validation analysis on your workbook and report?", 25);
 
-    const text =
-      "Based on the analysis, I'm drafting the evaluation report. Key findings to highlight: " +
-      "NPS of -23.5, with a striking 59-point gender gap \u2014 female students rated the experience " +
-      "positively (NPS +5.9) while male students were largely dissatisfied (NPS -52.9).\n\n" +
-      "Report length was the top friction point \u2014 only 32% found the Big Five report the right " +
-      "length, versus 68% for Wheel of Life. Partial support for all three assumptions, with clear " +
-      "recommendations for next steps.\n\nGenerating report...";
+  // Clear file in skill
+  clearFileInSkill();
 
-    await streamText(chatWindow, text, 25);
-    await wait(800);
-    appendChat("\nReport ready.");
+  addOutputCard(
+    "\uD83D\uDCC4",
+    "fc_prototype_report_v3.docx",
+    "Report Writer Skill",
+    "\uD83D\uDCE3 Reporting",
+    EMBED_URLS.report_draft
+  );
 
-    addOutputCard(
-      "\uD83D\uDCC4",
-      "fc_prototype_report_v3.docx",
-      "Report Writer Skill",
-      "\uD83D\uDCE3 Reporting",
-      EMBED_URLS.report_draft
-    );
+  // Update file tray: show both files for validation
+  setFileCards([
+    {
+      id: "fileCard3a",
+      emoji: "\uD83D\uDCCA",
+      name: "fc_prototype_stats_workbook_v3.xlsx",
+      btnId: "",
+      btnText: ""
+    },
+    {
+      id: "fileCard3b",
+      emoji: "\uD83D\uDCC4",
+      name: "fc_prototype_report_v3.docx",
+      btnId: "sendBtnBoth",
+      btnText: "\u2192 Send both to Critical Reviewer"
+    }
+  ]);
 
-    await wait(400);
-    enableButtons();
+  await wait(400);
+  enableButtons();
 
-    clearActionButtons();
-    addActionButton("\u2192 Validate", "btn-teal", function () {
-      if (currentBeat !== 3) return;
-      currentBeat = 4;
-      runBeat4();
-    });
-  }
-
-  // Auto-trigger send after skill panel transition
-  document.getElementById("sendBtn2").addEventListener("click", beat3Send);
-  pendingInputAction = beat3Send;
-  await wait(600);
-  beat3Send();
+  // Show validate button below chat
+  clearActionButtons();
+  addActionButton("\u2192 Validate", "btn-teal", function () {
+    if (currentBeat !== 3) return;
+    currentBeat = 4;
+    runBeat4();
+  });
 }
 
 // ===== BEAT 4 =====
@@ -419,88 +472,72 @@ async function runBeat4() {
   setSkill(
     "Critical Reviewer",
     "\uD83D\uDCE3 Reporting",
-    "Cross-checks outputs before they're finalized",
-    "Send files to begin"
+    "Cross-checks outputs before they're finalized"
   );
 
-  // Update file tray
-  setFileCards([
-    {
-      id: "fileCard3a",
-      emoji: "\uD83D\uDCCA",
-      name: "fc_prototype_stats_workbook_v3.xlsx",
-      btnId: "sendBtnBoth",
-      btnText: "\u2192 Send both to Critical Reviewer"
-    },
-    {
-      id: "fileCard3b",
-      emoji: "\uD83D\uDCC4",
-      name: "fc_prototype_report_v3.docx",
-      btnId: "sendBtnBoth2",
-      btnText: ""
-    }
-  ]);
+  // Animate both files to skill
+  const card1 = document.getElementById("fileCard3a");
+  const card2 = document.getElementById("fileCard3b");
 
-  // Hide second button
-  const secondBtn = document.getElementById("sendBtnBoth2");
-  if (secondBtn) secondBtn.style.display = "none";
+  if (card1) {
+    await animateFileToSkill(card1);
+    showFileInSkill("\uD83D\uDCCA", "fc_prototype_stats_workbook_v3.xlsx");
+  }
+  await wait(200);
+  if (card2) await animateFileToSkill(card2);
 
+  // Update to show both files received
+  skillFileZone.innerHTML =
+    '<div class="skill-file-received">' +
+      '<span class="skill-file-emoji">\uD83D\uDCCA</span>' +
+      '<span class="skill-file-name">workbook_v3.xlsx</span>' +
+    '</div>' +
+    '<div class="skill-file-received">' +
+      '<span class="skill-file-emoji">\uD83D\uDCC4</span>' +
+      '<span class="skill-file-name">report_v3.docx</span>' +
+    '</div>';
+  skillFileZone.classList.add("visible");
+
+  await wait(300);
+
+  clearChat();
+
+  const text =
+    "I've cross-checked all statistics in the workbook against the report narrative. " +
+    "The analysis is largely sound \u2014 NPS calculations, gender splits, correlations, and " +
+    "Wheel of Life domain means all verified correct.\n\n" +
+    "Two items need attention:\n\n" +
+    "Percentage formula: The Big Five percentage formula inflates scores by 6\u201310 percentage " +
+    "points, affecting category classifications for 44 individual trait assignments. Recommend " +
+    "documenting in the methodology or recalculating using the standard range-normalized formula.\n\n" +
+    "Missing significance test: The gender gap in NPS (+5.9 vs. -52.9) is the report's headline " +
+    "finding, but no formal significance test is presented. A Mann-Whitney U test is appropriate " +
+    "with this sample size.\n\n" +
+    "Four minor text-workbook discrepancies also flagged.\n\nValidation report ready.";
+
+  await streamText(chatWindow, text, 25);
+  await streamText(chatWindow, "\n\nWould you like to produce updated stats workbook and report?", 25);
+
+  clearFileInSkill();
+
+  addOutputCard(
+    "\u2705",
+    "fc_validation_report.pdf",
+    "Critical Reviewer Skill",
+    "\uD83D\uDCE3 Reporting",
+    EMBED_URLS.validation_report,
+    { sublabel: "2 issues \u00B7 4 minor flags" }
+  );
+
+  await wait(400);
   enableButtons();
 
-  async function beat4Send() {
-    if (isAnimating) return;
-    pendingInputAction = null;
-    disableAllButtons();
-
-    const card1 = document.getElementById("fileCard3a");
-    const card2 = document.getElementById("fileCard3b");
-    if (card1) await animateFileToSkill(card1);
-    await wait(100);
-    if (card2) await animateFileToSkill(card2);
-    inputZone.classList.add("glow");
-    await wait(300);
-
-    clearChat();
-
-    const text =
-      "I've cross-checked all statistics in the workbook against the report narrative. " +
-      "The analysis is largely sound \u2014 NPS calculations, gender splits, correlations, and " +
-      "Wheel of Life domain means all verified correct.\n\n" +
-      "Two items need attention:\n\n" +
-      "Percentage formula: The Big Five percentage formula inflates scores by 6\u201310 percentage " +
-      "points, affecting category classifications for 44 individual trait assignments. Recommend " +
-      "documenting in the methodology or recalculating using the standard range-normalized formula.\n\n" +
-      "Missing significance test: The gender gap in NPS (+5.9 vs. -52.9) is the report's headline " +
-      "finding, but no formal significance test is presented. A Mann-Whitney U test is appropriate " +
-      "with this sample size.\n\n" +
-      "Four minor text-workbook discrepancies also flagged.\n\nValidation report ready.";
-
-    await streamText(chatWindow, text, 25);
-
-    addOutputCard(
-      "\u2705",
-      "fc_validation_report.pdf",
-      "Critical Reviewer Skill",
-      "\uD83D\uDCE3 Reporting",
-      EMBED_URLS.validation_report,
-      { sublabel: "2 issues \u00B7 4 minor flags" }
-    );
-
-    await wait(400);
-    enableButtons();
-
-    clearActionButtons();
-    addActionButton("\u2192 Update & Finalize", "btn-navy", function () {
-      if (currentBeat !== 4) return;
-      currentBeat = 5;
-      runBeat5();
-    });
-  }
-
-  document.getElementById("sendBtnBoth").addEventListener("click", beat4Send);
-  pendingInputAction = beat4Send;
-  await wait(600);
-  beat4Send();
+  clearActionButtons();
+  addActionButton("\u2192 Update & Finalize", "btn-navy", function () {
+    if (currentBeat !== 4) return;
+    currentBeat = 5;
+    runBeat5();
+  });
 }
 
 // ===== BEAT 5 =====

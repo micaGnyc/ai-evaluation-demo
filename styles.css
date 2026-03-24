@@ -388,7 +388,7 @@ body {
   padding: 12px;
   margin-bottom: 12px;
   text-align: center;
-  transition: transform 0.4s ease, opacity 0.4s ease;
+  transition: transform 0.8s ease, opacity 0.8s ease;
   position: relative;
 }
 
@@ -434,26 +434,49 @@ body {
   margin-bottom: 12px;
 }
 
+/* File received zone in skill panel */
+.skill-file-zone {
+  margin-top: 10px;
+  display: none;
+}
+
+.skill-file-zone.visible {
+  display: block;
+}
+
+.skill-file-received {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #F0F8F9;
+  border: 1px solid #007A87;
+  border-radius: 6px;
+  padding: 8px 12px;
+  margin-bottom: 6px;
+  animation: fileArriveSkill 0.4s ease;
+}
+
+@keyframes fileArriveSkill {
+  from { opacity: 0; transform: translateX(-10px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+.skill-file-emoji {
+  font-size: 20px;
+  flex-shrink: 0;
+}
+
+.skill-file-name {
+  font-size: 11px;
+  color: #1B2A4A;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 .skill-input-zone {
-  background: #007A87;
-  color: #FFFFFF;
-  border: none;
-  border-radius: 8px;
-  padding: 12px;
-  text-align: center;
-  font-style: normal;
-  font-weight: 600;
-  font-size: 14px;
-  transition: box-shadow 0.3s ease, background 0.2s ease, opacity 0.2s ease;
-  cursor: pointer;
-}
-
-.skill-input-zone:hover {
-  background: #006570;
-}
-
-.skill-input-zone.glow {
-  box-shadow: 0 0 0 3px rgba(0, 122, 135, 0.3);
+  display: none;
 }
 
 /* Chat window */
